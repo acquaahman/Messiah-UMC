@@ -1022,19 +1022,19 @@
 
     <div class="space-grid">
       <div class="space-card">
-        <div class="space-photo"><!-- TODO: Add Pavilion photo --><div class="space-photo-placeholder">Photo coming soon</div></div>
+        <div class="space-photo"><img src="images/space-pavilion.jpg" alt="Interior view of the Messiah UMC Pavilion showing covered picnic seating" loading="lazy"></div>
         <div class="space-name">Pavilion</div>
         <div class="space-desc">A versatile outdoor-adjacent space perfect for celebrations, community gatherings, and outdoor-friendly events.</div>
         <div class="space-rate"><span class="call-note">Call for pricing</span></div>
       </div>
       <div class="space-card">
-        <div class="space-photo"><!-- TODO: Add Gym photo --><div class="space-photo-placeholder">Photo coming soon</div></div>
+        <div class="space-photo"><img src="images/space-gym.jpg" alt="Messiah UMC gymnasium with basketball hoop and open floor space" loading="lazy"></div>
         <div class="space-name">Gym</div>
         <div class="space-desc">A spacious open floor ideal for sports events, large gatherings, receptions, and community activities.</div>
         <div class="space-rate">$40/hour</div>
       </div>
       <div class="space-card">
-        <div class="space-photo"><!-- TODO: Add Sanctuary photo --><div class="space-photo-placeholder">Photo coming soon</div></div>
+        <div class="space-photo"><img src="images/space-sanctuary.jpg" alt="Messiah UMC sanctuary interior with pews and stained glass cross at altar" loading="lazy"></div>
         <div class="space-name">Sanctuary</div>
         <div class="space-desc">Our historic sanctuary, ideal for weddings, memorials, and formal ceremonies.</div>
         <div class="space-rate"><span class="call-note">Call for pricing</span></div>
@@ -1182,6 +1182,12 @@
 <div class="chat-bubble" onclick="this.previousElementSibling.style.display='none'">💬</div>
 
 <script>
+// ============================================================
+//  CONFIG — Messiah UMC Rental System
+// ============================================================
+const SUPABASE_URL      = 'https://qxlssbpjspkhgtcixqgx.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_GjV1BYXA6TS0K_BQqv8sMA_5MrRV3Nk';
+
 document.addEventListener('DOMContentLoaded', function () {
   // Minimum date: today
   var dateInput = document.getElementById('rentalDate');
@@ -1192,24 +1198,60 @@ document.addEventListener('DOMContentLoaded', function () {
 
   var rentalForm = document.getElementById('rentalForm');
   if (rentalForm) {
-    rentalForm.addEventListener('submit', function (e) {
+    rentalForm.addEventListener('submit', async function (e) {
       e.preventDefault();
 
-      // ============================================================
-      //  TODO: Replace with real Formspree endpoint once created
-      //  const RENTAL_FORMSPREE_ENDPOINT = "https://formspree.io/f/YOUR_ID";
-      //
-      //  fetch(RENTAL_FORMSPREE_ENDPOINT, {
-      //    method: 'POST',
-      //    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      //    body: JSON.stringify(Object.fromEntries(new FormData(rentalForm).entries()))
-      //  });
-      //
-      //  Also save to Supabase 'rental_requests' table here once schema is built.
-      // ============================================================
+      var btn = rentalForm.querySelector('button[type="submit"]');
+      var originalBtnText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = 'Submitting…';
 
-      rentalForm.style.display = 'none';
-      document.getElementById('rentalSuccess').style.display = 'block';
+      var data = Object.fromEntries(new FormData(rentalForm).entries());
+
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/rental_requests`, {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({
+            name:        data.name,
+            email:       data.email,
+            phone:       data.phone,
+            space:       data.space,
+            event_date:  data.eventDate,
+            guest_count: parseInt(data.guestCount, 10),
+            event_type:  data.eventType,
+            notes:       data.notes || null,
+            status:      'pending'
+          })
+        });
+
+        if (!res.ok) throw new Error('Supabase insert failed');
+
+        // ============================================================
+        //  TODO: Add email/SMS notification to Rev. Johnson here once
+        //  a Formspree endpoint or Netlify function is set up, e.g.:
+        //
+        //  fetch(RENTAL_FORMSPREE_ENDPOINT, {
+        //    method: 'POST',
+        //    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        //    body: JSON.stringify(data)
+        //  });
+        // ============================================================
+
+        rentalForm.style.display = 'none';
+        document.getElementById('rentalSuccess').style.display = 'block';
+
+      } catch (err) {
+        console.error('Rental request error:', err);
+        alert('Something went wrong submitting your request. Please call the church office directly at (610) 828-0118.');
+        btn.disabled = false;
+        btn.innerHTML = originalBtnText;
+      }
     });
   }
 });
