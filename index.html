@@ -665,6 +665,22 @@
     .footer-inner { flex-direction: column; text-align: center; }
     .pastor-grid { gap: 2rem; }
     .welcome-img-accent { display: none; }
+
+    /* QUICK ACCESS — clean 2-column grid on mobile */
+    .quick-access {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      padding: 0;
+    }
+    .quick-item {
+      border-right: 1px solid rgba(255,255,255,0.1);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding: 1.25rem 0.5rem;
+      min-width: 0;
+    }
+    .quick-item:nth-child(2n) { border-right: none; }
+    .quick-item:nth-last-child(-n+2) { border-bottom: none; }
   }
 
   /* RENTAL SECTION */
