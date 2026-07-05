@@ -674,10 +674,14 @@
   .space-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 4rem; }
   .space-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(201,168,76,0.25); border-radius: 4px; padding: 2rem 1.75rem; transition: border-color 0.25s, transform 0.25s; }
   .space-card:hover { border-color: var(--gold); transform: translateY(-4px); }
-  .space-icon { font-size: 2rem; margin-bottom: 1rem; }
   .space-name { font-family: var(--font-display); font-size: 1.15rem; color: var(--gold-lt); margin-bottom: 0.5rem; }
   .space-desc { font-size: 0.85rem; color: rgba(255,255,255,0.65); line-height: 1.7; margin-bottom: 1rem; }
   .space-capacity { font-size: 0.75rem; color: var(--gold); letter-spacing: 0.05em; text-transform: uppercase; }
+  .space-photo { width: 100%; height: 180px; border-radius: 4px; margin-bottom: 1.25rem; overflow: hidden; background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; }
+  .space-photo img { width: 100%; height: 100%; object-fit: cover; }
+  .space-photo-placeholder { color: rgba(255,255,255,0.3); font-size: 0.78rem; text-align: center; padding: 1rem; }
+  .space-rate { font-size: 0.95rem; color: var(--white); font-weight: 600; margin-bottom: 0.75rem; }
+  .space-rate .call-note { font-size: 0.78rem; color: rgba(255,255,255,0.55); font-weight: 400; font-style: italic; }
   .rental-form-wrap { background: rgba(255,255,255,0.03); border: 1px solid rgba(201,168,76,0.25); border-radius: 6px; padding: 2.5rem; max-width: 720px; margin: 0 auto; }
   .rental-form-title { font-family: var(--font-display); font-size: 1.4rem; color: var(--white); text-align: center; margin-bottom: 0.5rem; }
   .rental-form-sub { text-align: center; font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-bottom: 2rem; }
@@ -1002,22 +1006,22 @@
 
     <div class="space-grid">
       <div class="space-card">
-        <div class="space-icon">⛪</div>
+        <div class="space-photo"><!-- TODO: Add Pavilion photo --><div class="space-photo-placeholder">Photo coming soon</div></div>
+        <div class="space-name">Pavilion</div>
+        <div class="space-desc">A versatile outdoor-adjacent space perfect for celebrations, community gatherings, and outdoor-friendly events.</div>
+        <div class="space-rate"><span class="call-note">Call for pricing</span></div>
+      </div>
+      <div class="space-card">
+        <div class="space-photo"><!-- TODO: Add Gym photo --><div class="space-photo-placeholder">Photo coming soon</div></div>
+        <div class="space-name">Gym</div>
+        <div class="space-desc">A spacious open floor ideal for sports events, large gatherings, receptions, and community activities.</div>
+        <div class="space-rate">$40/hour</div>
+      </div>
+      <div class="space-card">
+        <div class="space-photo"><!-- TODO: Add Sanctuary photo --><div class="space-photo-placeholder">Photo coming soon</div></div>
         <div class="space-name">Sanctuary</div>
         <div class="space-desc">Our historic sanctuary, ideal for weddings, memorials, and formal ceremonies.</div>
-        <div class="space-capacity">Details Coming Soon</div>
-      </div>
-      <div class="space-card">
-        <div class="space-icon">🍽️</div>
-        <div class="space-name">Fellowship Hall</div>
-        <div class="space-desc">A spacious hall perfect for receptions, banquets, and community gatherings.</div>
-        <div class="space-capacity">Details Coming Soon</div>
-      </div>
-      <div class="space-card">
-        <div class="space-icon">📚</div>
-        <div class="space-name">Meeting & Classroom Space</div>
-        <div class="space-desc">Smaller rooms suited for meetings, workshops, and intimate gatherings.</div>
-        <div class="space-capacity">Details Coming Soon</div>
+        <div class="space-rate"><span class="call-note">Call for pricing</span></div>
       </div>
     </div>
 
@@ -1046,9 +1050,9 @@
             <label for="rentalSpace">Space Requested *</label>
             <select id="rentalSpace" name="space" required>
               <option value="">Select a space</option>
+              <option value="Pavilion">Pavilion</option>
+              <option value="Gym">Gym ($40/hour)</option>
               <option value="Sanctuary">Sanctuary</option>
-              <option value="Fellowship Hall">Fellowship Hall</option>
-              <option value="Meeting/Classroom Space">Meeting & Classroom Space</option>
               <option value="Not Sure">Not sure yet</option>
             </select>
           </div>
