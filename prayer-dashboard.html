@@ -248,48 +248,10 @@
 
 <script>
 // ============================================================
-//  CONFIG — same Supabase project as the rental dashboard
+//  CONFIG
 // ============================================================
-const STALE_DAYS = 30; // requests older than this get flagged
-
-let allRequests = [];
-
-async function checkPassword() {
-  const input = document.getElementById('pwInput').value.trim();
-  const error = document.getElementById('pwError');
-
-  error.style.display = 'none';
-
-  try {
-    const response = await fetch('/.netlify/functions/admin-login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        password: input
-      })
-    });
-
-    const result = await response.json();
-
-    if (response.ok && result.success) {
-      document.getElementById('passwordScreen').style.display = 'none';
-      sessionStorage.setItem('messiah_prayer_dashboard_access', 'granted');
-      loadRequests();
-    } else {
-      error.style.display = 'block';
-      document.getElementById('pwInput').value = '';
-    }
-
-  } catch (err) {
-    console.error('Login error:', err);
-    error.style.display = 'block';
-  }
-}onst SUPABASE_URL      = 'https://qxlssbpjspkhgtcixqgx.supabase.co';
+const SUPABASE_URL      = 'https://qxlssbpjspkhgtcixqgx.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_GjV1BYXA6TS0K_BQqv8sMA_5MrRV3Nk';
-
-
 
 const STALE_DAYS = 30; // requests older than this get flagged
 
@@ -333,8 +295,6 @@ async function checkPassword() {
     error.style.display = 'block';
   }
 }
- 
-
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('pwInput').addEventListener('keydown', (e) => {
     if (e.key === 'Enter') checkPassword();
