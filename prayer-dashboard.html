@@ -173,6 +173,24 @@
   .pw-input::placeholder { color: rgba(255,255,255,0.4); }
   .pw-btn { width: 100%; background: var(--gold); color: var(--dark); border: none; border-radius: 8px; padding: 0.85rem; font-weight: 700; font-size: 1rem; cursor: pointer; }
   .pw-error { color: #ff8a8a; font-size: 0.85rem; margin-top: 0.75rem; display: none; }
+
+  .export-overlay {
+    display: none; position: fixed; inset: 0; z-index: 500;
+    background: rgba(26,10,10,0.65); align-items: center; justify-content: center; padding: 1.5rem;
+  }
+  .export-overlay.open { display: flex; }
+  .export-modal {
+    background: var(--white); border: 1px solid rgba(139,0,0,0.2); border-radius: 10px;
+    max-width: 640px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 2rem;
+  }
+  .export-modal h2 { font-family: var(--font-display); color: var(--crimson); margin-bottom: 0.5rem; }
+  .export-modal p { font-size: 0.9rem; color: var(--muted); margin-bottom: 1rem; }
+  .export-textarea {
+    width: 100%; min-height: 220px; padding: 1rem; border: 1px solid rgba(139,0,0,0.2); border-radius: 6px;
+    font-family: var(--font-body); font-size: 0.9rem; line-height: 1.6; color: var(--dark); resize: vertical;
+  }
+  .export-actions { display: flex; gap: 0.75rem; margin-top: 1rem; justify-content: flex-end; }
+  .export-copied-msg { color: var(--success); font-size: 0.85rem; margin-top: 0.5rem; display: none; }
 </style>
 </head>
 <body>
@@ -203,6 +221,7 @@
       <option value="completed">Completed</option>
     </select>
     <button class="refresh-btn" onclick="loadRequests()">↻ Refresh</button>
+    <button class="refresh-btn" style="background:transparent; border:1px solid var(--gold); color:var(--gold-lt);" onclick="openExportModal()">📋 Copy List for Bulletin</button>
   </div>
 </header>
 
@@ -212,6 +231,20 @@
     <div class="loading-state">Loading requests…</div>
   </div>
 </main>
+
+<!-- EXPORT FOR BULLETIN MODAL -->
+<div class="export-overlay" id="exportOverlay">
+  <div class="export-modal">
+    <h2>Copy List for Bulletin</h2>
+    <p>This includes only <strong>active</strong> requests, formatted the same way they already appear in the bulletin. Click "Copy to Clipboard," then paste directly into the bulletin document.</p>
+    <textarea class="export-textarea" id="exportText" readonly onclick="this.select()"></textarea>
+    <div class="export-actions">
+      <button class="btn btn-delete" onclick="closeExportModal()">Close</button>
+      <button class="btn btn-confirm" onclick="copyExportText()">Copy to Clipboard</button>
+    </div>
+    <div class="export-copied-msg" id="exportCopiedMsg">✓ Copied! You can now paste it into the bulletin.</div>
+  </div>
+</div>
 
 <script>
 // ============================================================
@@ -406,6 +439,46 @@ function escapeHtml(str) {
   div.textContent = str;
   return div.innerHTML;
 }
+
+// ============================================================
+//  COPY LIST FOR BULLETIN
+// ============================================================
+function openExportModal() {
+  const active = allRequests.filter(r => r.status === 'active');
+  const lines = active.map(r => {
+    const details = (r.details || '').trim();
+    return details ? `${r.name} ${details}` : r.name;
+  });
+  const text = 'PRAYERS: ' + lines.join(', ') + '.';
+
+  document.getElementById('exportText').value = text;
+  document.getElementById('exportCopiedMsg').style.display = 'none';
+  document.getElementById('exportOverlay').classList.add('open');
+}
+
+function closeExportModal() {
+  document.getElementById('exportOverlay').classList.remove('open');
+}
+
+async function copyExportText() {
+  const textarea = document.getElementById('exportText');
+  const msg = document.getElementById('exportCopiedMsg');
+  textarea.select();
+
+  try {
+    await navigator.clipboard.writeText(textarea.value);
+    msg.style.display = 'block';
+  } catch (err) {
+    // Clipboard API blocked (common in some browser/security contexts) —
+    // the text is already selected above, so a manual Ctrl+C / Cmd+C still works.
+    msg.textContent = 'Text is selected — press Ctrl+C (or Cmd+C on Mac) to copy.';
+    msg.style.display = 'block';
+  }
+}
+
+document.getElementById('exportOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeExportModal();
+});
 </script>
 </body>
 </html>
