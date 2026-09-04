@@ -715,6 +715,38 @@
     transform: rotate(45deg);
   }
 
+  .chat-panel {
+    display: none;
+    position: fixed; bottom: 6rem; right: 2rem;
+    width: 340px; max-width: calc(100vw - 2.5rem);
+    height: 460px; max-height: calc(100vh - 9rem);
+    background: var(--crimson-dk);
+    border: 1px solid rgba(201,168,76,0.4);
+    border-radius: 8px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+    z-index: 999;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .chat-panel.open { display: flex; }
+  .chat-panel-head {
+    background: var(--crimson); padding: 0.9rem 1.1rem; display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid rgba(201,168,76,0.35);
+  }
+  .chat-panel-head-title { color: var(--white); font-weight: 700; font-size: 0.95rem; }
+  .chat-panel-head-sub { color: var(--gold-lt); font-size: 0.72rem; }
+  .chat-panel-close { background: none; border: none; color: var(--white); font-size: 1.2rem; cursor: pointer; }
+  .chat-panel-body { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.6rem; }
+  .chat-msg-bot { background: rgba(255,255,255,0.08); color: var(--white); padding: 0.6rem 0.85rem; border-radius: 10px 10px 10px 3px; font-size: 0.85rem; line-height:1.5; align-self: flex-start; max-width: 88%; }
+  .chat-msg-user { background: var(--gold); color: var(--dark); padding: 0.6rem 0.85rem; border-radius: 10px 10px 3px 10px; font-size: 0.85rem; align-self: flex-end; max-width: 85%; }
+  .chat-quick-replies { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0 1rem 1rem; }
+  .chat-quick-btn {
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(201,168,76,0.4); color: var(--gold-lt);
+    font-size: 0.78rem; padding: 0.45rem 0.8rem; border-radius: 20px; cursor: pointer; font-family: inherit;
+  }
+  .chat-quick-btn:hover { background: rgba(201,168,76,0.18); }
+  .chat-quick-btn.primary { background: var(--gold); color: var(--dark); border-color: var(--gold); font-weight: 700; }
+
   /* ── ANIMATIONS ── */
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(24px); }
@@ -850,7 +882,7 @@
     <p class="hero-sub">Messiah United Methodist Church · Lafayette Hill, Pennsylvania</p>
     <p class="hero-est">Established 1952 · A Community of Diverse Families & Friends</p>
     <div class="hero-btns">
-      <a href="#welcome" class="btn-primary">▶ Plan Your Visit</a>
+      <a href="plan-a-visit.html" class="btn-primary">▶ Plan Your Visit</a>
       <a href="https://www.facebook.com/MessiahMethodistChurch" target="_blank" class="btn-outline">📡 Watch Live</a>
     </div>
   </div>
@@ -874,11 +906,11 @@
     <span class="quick-icon">📅</span>
     <span class="quick-label">Events</span>
   </a>
-  <a href="#contact" class="quick-item">
+  <a href="plan-a-visit.html" class="quick-item">
     <span class="quick-icon">🙌</span>
     <span class="quick-label">I'm New Here</span>
   </a>
-  <a href="#contact" class="quick-item">
+  <a href="#" class="quick-item" onclick="openPrayerModal(); return false;">
     <span class="quick-icon">💬</span>
     <span class="quick-label">Prayer Request</span>
   </a>
@@ -903,7 +935,7 @@
         <br>
         <p class="section-body">Nestled on a small hill off of Ridge Avenue, just west of Philadelphia in Lafayette Hill, PA, Messiah's story began in March 1952, when the original 4½ acre property was purchased — its Victorian mansion becoming our first worship site. Wesley Hall, our present sanctuary, broke ground in 1954 and was completed the following year, and the church took the name Messiah in 1957.</p>
         <br>
-        <a href="#contact" class="btn-primary" style="margin-top:1rem;">Plan Your Visit →</a>
+        <a href="plan-a-visit.html" class="btn-primary" style="margin-top:1rem;">Plan Your Visit →</a>
       </div>
     </div>
   </div>
@@ -972,7 +1004,7 @@
       <div class="ministry-card">
         <div class="staff-photo"><img src="images/staff-pianist.jpg" alt="Ransford Addae" loading="lazy"></div>
         <div class="ministry-name">Ransford Addae</div>
-        <div class="ministry-desc">Messiah's Music Director, Ransford brings talent and heart to our worship services, helping lead the congregation in praise each week. [Full bio coming soon]</div>
+        <div class="ministry-desc">Ransford Kwabena Addae is a Ghanaian collaborative pianist and music educator currently pursuing an M.S.Ed. in Higher Education at the University of Pennsylvania. He holds a Master of Music in Collaborative Piano from the University of Mississippi and a Bachelor of Arts in Music Education from the University of Education, Winneba. Ransford has collaborated with choirs, vocalists, and instrumentalists in both Ghana and the United States and is passionate about music ministry, education, and developing the next generation of musicians.</div>
       </div>
       <div class="ministry-card">
         <div class="staff-photo"><img src="images/staff-kristen.jpg" alt="Kristen" loading="lazy"></div>
@@ -1064,6 +1096,52 @@
   </div>
 </div>
 
+<!-- PRAYER REQUEST MODAL -->
+<div class="ministry-modal-overlay" id="prayerModalOverlay">
+  <div class="ministry-modal" style="max-width:600px;">
+    <button class="ministry-modal-close" onclick="closePrayerModal()" aria-label="Close">&times;</button>
+    <img class="ministry-modal-image" src="images/prayer-photo.jpg" alt="Members of Messiah praying together during service" style="display:block; width:100%; border-radius:4px; margin-bottom:1.25rem;">
+
+    <div id="prayerFormView">
+      <div class="ministry-modal-title" style="margin-bottom:0.5rem;">How Can I Pray For You?</div>
+      <div class="ministry-modal-body" style="margin-bottom:1rem;">Share what's on your heart below — our prayer team holds every request with care and confidentiality.</div>
+      <div style="background:rgba(201,168,76,0.12); border:1px solid rgba(201,168,76,0.35); border-radius:4px; padding:0.9rem 1.1rem; margin-bottom:1.5rem; font-size:0.85rem; color:var(--gold-lt);">
+        🙏 Join us for <strong>Corporate Virtual Prayer</strong> — Mondays, Wednesdays &amp; Fridays at 7:00 PM on our Facebook and Instagram.
+      </div>
+      <form id="prayerForm">
+        <div style="margin-bottom:1rem;">
+          <label style="display:block; font-size:0.8rem; color:var(--gold); margin-bottom:0.35rem;">Your Name *</label>
+          <input type="text" id="prayerName" name="name" required style="width:100%; padding:0.65rem 0.8rem; border-radius:4px; border:1px solid rgba(201,168,76,0.35); background:rgba(255,255,255,0.06); color:var(--white); font-size:0.9rem;">
+        </div>
+        <div style="margin-bottom:1rem;">
+          <label style="display:block; font-size:0.8rem; color:var(--gold); margin-bottom:0.35rem;">Email or Phone *</label>
+          <input type="text" id="prayerContact" name="contact" required placeholder="So our prayer team can follow up" style="width:100%; padding:0.65rem 0.8rem; border-radius:4px; border:1px solid rgba(201,168,76,0.35); background:rgba(255,255,255,0.06); color:var(--white); font-size:0.9rem;">
+        </div>
+        <div style="margin-bottom:1.5rem;">
+          <label style="display:block; font-size:0.8rem; color:var(--gold); margin-bottom:0.35rem;">What would you like prayer for? *</label>
+          <textarea id="prayerDetails" name="details" required rows="4" placeholder="Share as much or as little as you'd like" style="width:100%; padding:0.65rem 0.8rem; border-radius:4px; border:1px solid rgba(201,168,76,0.35); background:rgba(255,255,255,0.06); color:var(--white); font-size:0.9rem; resize:vertical;"></textarea>
+        </div>
+        <label style="display:flex; align-items:flex-start; gap:0.5rem; font-size:0.8rem; color:rgba(255,255,255,0.75); margin-bottom:1.5rem;">
+          <input type="checkbox" id="prayerConfidential" style="margin-top:0.2rem;">
+          Keep this request confidential (visible only to the pastor and prayer team lead)
+        </label>
+        <button type="submit" class="btn-primary" style="width:100%; border:none; cursor:pointer;">Send Prayer Request</button>
+        <div id="prayerFormError" style="display:none; color:var(--gold-lt); font-size:0.82rem; margin-top:0.75rem; text-align:center;"></div>
+      </form>
+    </div>
+
+    <div id="prayerSuccessView" style="display:none; text-align:center; padding:1rem 0;">
+      <div style="font-size:2.5rem; margin-bottom:1rem;">🙏</div>
+      <div class="ministry-modal-title">Your Request Has Been Received</div>
+      <div class="ministry-modal-body">A member of our prayer team will be in touch with you soon. Thank you for trusting us with this.</div>
+      <div style="background:rgba(201,168,76,0.12); border:1px solid rgba(201,168,76,0.35); border-radius:4px; padding:0.9rem 1.1rem; margin:1rem 0; font-size:0.85rem; color:var(--gold-lt);">
+        🙏 In the meantime, join us for <strong>Corporate Virtual Prayer</strong> — Mondays, Wednesdays &amp; Fridays at 7:00 PM on Facebook and Instagram.
+      </div>
+      <button class="btn-primary" style="border:none; cursor:pointer;" onclick="closePrayerModal()">Close</button>
+    </div>
+  </div>
+</div>
+
 <!-- EVENTS -->
 <section id="events">
   <div class="section-inner">
@@ -1073,47 +1151,69 @@
     <div class="events-list">
       <div class="event-item">
         <div class="event-date">
-          <div class="event-month">Aug</div>
-          <div class="event-day">2</div>
+          <div class="event-month">Sep</div>
+          <div class="event-day">13</div>
         </div>
         <div>
-          <div class="event-name">Communion Sunday &mdash; Welcoming Ransford Addae</div>
-          <div class="event-detail">9:30 AM · Sanctuary · First Sunday Communion, and a warm welcome to our new Music Director, Ransford Addae</div>
+          <div class="event-name">Return to 10:30 AM Worship</div>
+          <div class="event-detail">Our worship time moves from 9:30 AM to 10:30 AM starting this Sunday</div>
         </div>
         <div class="event-tag">Worship</div>
       </div>
       <div class="event-item">
         <div class="event-date">
-          <div class="event-month">Aug</div>
-          <div class="event-day">9</div>
+          <div class="event-month">Sep</div>
+          <div class="event-day">16</div>
         </div>
         <div>
-          <div class="event-name">Reina Johnson's Last Sunday</div>
-          <div class="event-detail">9:30 AM · Sanctuary · Join us in thanking Reina for her years of service, with blessings for what's ahead</div>
+          <div class="event-name">Pastor's Wednesday Bible Study Resumes</div>
+          <div class="event-detail">Evening Bible study with Pastor Johnson resumes for the fall</div>
         </div>
-        <div class="event-tag">Special</div>
+        <div class="event-tag">Study</div>
       </div>
       <div class="event-item">
         <div class="event-date">
-          <div class="event-month">Aug</div>
-          <div class="event-day">21</div>
+          <div class="event-month">Sep</div>
+          <div class="event-day">20</div>
         </div>
         <div>
-          <div class="event-name">Backpack Assembly</div>
-          <div class="event-detail">Volunteers gather to prepare prefilled backpacks ahead of the giveaway</div>
+          <div class="event-name">Sunday School Resumes &amp; Back to Church Block Party</div>
+          <div class="event-detail">Sunday School returns for the school year, celebrated with a Back to Church Block Party</div>
+        </div>
+        <div class="event-tag">Community</div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">
+          <div class="event-month">Sep</div>
+          <div class="event-day">25</div>
+        </div>
+        <div>
+          <div class="event-name">WHAM — Candle Decorating</div>
+          <div class="event-detail">7:00 PM · Kolva Hall · See Patty for details</div>
+        </div>
+        <div class="event-tag">Fellowship</div>
+      </div>
+      <div class="event-item">
+        <div class="event-date">
+          <div class="event-month">Sep</div>
+          <div class="event-day">26</div>
+        </div>
+        <div>
+          <div class="event-name">Health &amp; Wellness Day at Messiah</div>
+          <div class="event-detail">10:00 AM – 2:00 PM · 527 Ridge Pike · Health assessments, screenings, resources & more — see Kim Charleston</div>
         </div>
         <div class="event-tag">Outreach</div>
       </div>
       <div class="event-item">
         <div class="event-date">
-          <div class="event-month">Aug</div>
-          <div class="event-day">22</div>
+          <div class="event-month">Sep</div>
+          <div class="event-day">27</div>
         </div>
         <div>
-          <div class="event-name">Backpack Give-Away</div>
-          <div class="event-detail">1:00 – 4:00 PM · Distribution of sponsored backpacks to students in the community</div>
+          <div class="event-name">Kid Konnection Resumes</div>
+          <div class="event-detail">After Children's Time with the Pastor</div>
         </div>
-        <div class="event-tag">Outreach</div>
+        <div class="event-tag">Kids</div>
       </div>
     </div>
     <div style="text-align:center; margin-top:2rem;">
@@ -1301,9 +1401,23 @@
   </div>
 </footer>
 
-<!-- CHATBOT BUBBLE -->
-<div class="chat-tooltip">👋 Hi! How can we help you today?</div>
-<div class="chat-bubble" onclick="this.previousElementSibling.style.display='none'">💬</div>
+<!-- CHATBOT WIDGET -->
+<div class="chat-tooltip" id="chatTooltip">👋 Hi! How can we help you today?</div>
+<div class="chat-bubble" id="chatBubble" onclick="toggleChatPanel()">💬</div>
+
+<div class="chat-panel" id="chatPanel">
+  <div class="chat-panel-head">
+    <div>
+      <div class="chat-panel-head-title">Messiah UMC</div>
+      <div class="chat-panel-head-sub">We usually reply right here</div>
+    </div>
+    <button class="chat-panel-close" onclick="toggleChatPanel()" aria-label="Close chat">&times;</button>
+  </div>
+  <div class="chat-panel-body" id="chatPanelBody">
+    <div class="chat-msg-bot">Hi! 👋 Welcome to Messiah United Methodist Church. Are you new here, or is there something I can help you find?</div>
+  </div>
+  <div class="chat-quick-replies" id="chatQuickReplies"></div>
+</div>
 
 <script>
 // ============================================================
@@ -1472,6 +1586,127 @@ document.getElementById('ministryModalOverlay').addEventListener('click', functi
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') closeMinistryModal();
 });
+
+// ============================================================
+//  PRAYER REQUEST MODAL
+// ============================================================
+const PRAYER_FORMSPREE_ENDPOINT = "https://formspree.io/f/REPLACE_ME_PRAYER";
+
+function openPrayerModal() {
+  document.getElementById('prayerFormView').style.display = 'block';
+  document.getElementById('prayerSuccessView').style.display = 'none';
+  document.getElementById('prayerModalOverlay').classList.add('open');
+}
+function closePrayerModal() {
+  document.getElementById('prayerModalOverlay').classList.remove('open');
+}
+document.getElementById('prayerModalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closePrayerModal();
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closePrayerModal();
+});
+
+document.getElementById('prayerForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const errorEl = document.getElementById('prayerFormError');
+  errorEl.style.display = 'none';
+
+  if (PRAYER_FORMSPREE_ENDPOINT.includes('REPLACE_ME')) {
+    errorEl.textContent = "This form isn't connected yet — Formspree endpoint still needs to be set up.";
+    errorEl.style.display = 'block';
+    return;
+  }
+
+  const btn = this.querySelector('button[type="submit"]');
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+
+  const payload = {
+    name: document.getElementById('prayerName').value,
+    contact: document.getElementById('prayerContact').value,
+    details: document.getElementById('prayerDetails').value,
+    confidential: document.getElementById('prayerConfidential').checked ? 'Yes — confidential' : 'No',
+    submitted_at: new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
+  };
+
+  try {
+    const res = await fetch(PRAYER_FORMSPREE_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (res.ok) {
+      document.getElementById('prayerFormView').style.display = 'none';
+      document.getElementById('prayerSuccessView').style.display = 'block';
+      document.getElementById('prayerForm').reset();
+    } else {
+      errorEl.textContent = "Something went wrong. Please call us at (610) 828-0118 instead.";
+      errorEl.style.display = 'block';
+    }
+  } catch (err) {
+    errorEl.textContent = "Something went wrong. Please call us at (610) 828-0118 instead.";
+    errorEl.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Send Prayer Request';
+  }
+});
+
+// ============================================================
+//  CHATBOT — canned flow, primary action is Plan Your Visit
+// ============================================================
+const chatReplies = {
+  main: [
+    { label: "🏠 Plan My First Visit", primary: true, action: () => { window.location.href = 'plan-a-visit.html'; } },
+    { label: "🕐 Service Times", action: () => chatBotSay("Summer hours: Sunday worship at 9:30 AM. We return to 10:30 AM starting September 13th. 527 W Ridge Pike, Lafayette Hill, PA.") },
+    { label: "📍 Directions", action: () => chatBotSay("We're at 527 W Ridge Pike, Lafayette Hill, PA 19444 — <a href='https://www.google.com/maps/place/Messiah+United+Methodist+Church' target='_blank' style='color:var(--gold-lt);'>Get Directions →</a>") },
+    { label: "🙏 Prayer Request", action: () => { toggleChatPanel(); openPrayerModal(); } },
+    { label: "💝 Give Online", action: () => chatBotSay("You can give securely online any time — <a href='https://tithe.ly/give?c=193973' target='_blank' style='color:var(--gold-lt);'>Give Now →</a>") },
+    { label: "📡 Watch Live", action: () => chatBotSay("We stream live on Facebook every Sunday — <a href='https://www.facebook.com/MessiahMethodistChurch' target='_blank' style='color:var(--gold-lt);'>Watch Live →</a>") },
+  ]
+};
+
+function chatAddMsg(html, cls) {
+  const body = document.getElementById('chatPanelBody');
+  const div = document.createElement('div');
+  div.className = cls;
+  div.innerHTML = html;
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+}
+
+function chatBotSay(html) {
+  chatAddMsg(html, 'chat-msg-bot');
+  setTimeout(() => chatAddMsg("Anything else I can help with?", 'chat-msg-bot'), 400);
+  renderChatQuickReplies();
+}
+
+function renderChatQuickReplies() {
+  const area = document.getElementById('chatQuickReplies');
+  area.innerHTML = '';
+  chatReplies.main.forEach(item => {
+    const btn = document.createElement('button');
+    btn.className = 'chat-quick-btn' + (item.primary ? ' primary' : '');
+    btn.textContent = item.label;
+    btn.onclick = () => {
+      chatAddMsg(item.label, 'chat-msg-user');
+      item.action();
+    };
+    area.appendChild(btn);
+  });
+}
+
+function toggleChatPanel() {
+  const panel = document.getElementById('chatPanel');
+  const isOpen = panel.classList.toggle('open');
+  document.getElementById('chatTooltip').style.display = 'none';
+  document.getElementById('chatBubble').textContent = isOpen ? '×' : '💬';
+  if (isOpen && !panel.dataset.started) {
+    panel.dataset.started = '1';
+    renderChatQuickReplies();
+  }
+}
 </script>
 </body>
 </html>
