@@ -295,22 +295,42 @@
 const SUPABASE_URL      = 'https://qxlssbpjspkhgtcixqgx.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_GjV1BYXA6TS0K_BQqv8sMA_5MrRV3Nk';
 
-// TODO: change this to whatever code you want Mary/staff to use
-const DASHBOARD_ACCESS_CODE = 'messiah2026';
-
 let allRequests = [];
 
-function checkPassword() {
-  const input = document.getElementById('pwInput').value;
+async function checkPassword() {
+  const input = document.getElementById('pwInput').value.trim();
   const error = document.getElementById('pwError');
-  if (input.trim() === DASHBOARD_ACCESS_CODE) {
-    const screen = document.getElementById('passwordScreen');
-    screen.style.display = 'none';
-    sessionStorage.setItem('messiah_dashboard_access', 'granted');
-    loadRequests();
-  } else {
+
+  error.style.display = 'none';
+
+  try {
+    const response = await fetch('/.netlify/functions/admin-login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        password: input
+      })
+    });
+
+    const result = await response.json();
+
+    if (response.ok && result.success) {
+      const screen = document.getElementById('passwordScreen');
+      screen.style.display = 'none';
+
+      sessionStorage.setItem('messiah_dashboard_access', 'granted');
+
+      loadRequests();
+    } else {
+      error.style.display = 'block';
+      document.getElementById('pwInput').value = '';
+    }
+
+  } catch (err) {
+    console.error('Login error:', err);
     error.style.display = 'block';
-    document.getElementById('pwInput').value = '';
   }
 }
 
