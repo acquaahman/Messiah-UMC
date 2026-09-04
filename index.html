@@ -1590,8 +1590,6 @@ document.addEventListener('keydown', function(e) {
 // ============================================================
 //  PRAYER REQUEST MODAL
 // ============================================================
-const PRAYER_FORMSPREE_ENDPOINT = "https://formspree.io/f/REPLACE_ME_PRAYER";
-
 function openPrayerModal() {
   document.getElementById('prayerFormView').style.display = 'block';
   document.getElementById('prayerSuccessView').style.display = 'none';
@@ -1612,38 +1610,59 @@ document.getElementById('prayerForm').addEventListener('submit', async function(
   const errorEl = document.getElementById('prayerFormError');
   errorEl.style.display = 'none';
 
-  if (PRAYER_FORMSPREE_ENDPOINT.includes('REPLACE_ME')) {
-    errorEl.textContent = "This form isn't connected yet — Formspree endpoint still needs to be set up.";
-    errorEl.style.display = 'block';
-    return;
-  }
-
   const btn = this.querySelector('button[type="submit"]');
   btn.disabled = true;
   btn.textContent = 'Sending...';
 
-  const payload = {
-    name: document.getElementById('prayerName').value,
-    contact: document.getElementById('prayerContact').value,
-    details: document.getElementById('prayerDetails').value,
-    confidential: document.getElementById('prayerConfidential').checked ? 'Yes — confidential' : 'No',
-    submitted_at: new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
-  };
+  const name         = document.getElementById('prayerName').value;
+  const contact      = document.getElementById('prayerContact').value;
+  const details      = document.getElementById('prayerDetails').value;
+  const confidential = document.getElementById('prayerConfidential').checked;
+  const submittedAt  = new Date().toLocaleString('en-US', { timeZone: 'America/New_York' });
 
   try {
-    const res = await fetch(PRAYER_FORMSPREE_ENDPOINT, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/prayer_requests`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify(payload)
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({
+        name: name,
+        contact: contact,
+        details: details,
+        confidential: confidential,
+        status: 'active'
+      })
     });
-    if (res.ok) {
-      document.getElementById('prayerFormView').style.display = 'none';
-      document.getElementById('prayerSuccessView').style.display = 'block';
-      document.getElementById('prayerForm').reset();
-    } else {
-      errorEl.textContent = "Something went wrong. Please call us at (610) 828-0118 instead.";
-      errorEl.style.display = 'block';
+
+    if (!res.ok) throw new Error('Supabase insert failed');
+
+    // Notify the church office. Runs after the save succeeds; a failure
+    // here shouldn't block the confirmation screen since the request
+    // itself was already saved and will show up on the dashboard.
+    try {
+      await fetch('/.netlify/functions/notify-prayer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: 'messiahchurch@verizon.net',
+          name: name,
+          contact: contact,
+          details: details,
+          confidential: confidential,
+          submittedAt: submittedAt
+        })
+      });
+    } catch (notifyErr) {
+      console.error('Admin notification failed:', notifyErr);
     }
+
+    document.getElementById('prayerFormView').style.display = 'none';
+    document.getElementById('prayerSuccessView').style.display = 'block';
+    document.getElementById('prayerForm').reset();
   } catch (err) {
     errorEl.textContent = "Something went wrong. Please call us at (610) 828-0118 instead.";
     errorEl.style.display = 'block';
