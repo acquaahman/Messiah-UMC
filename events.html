@@ -1030,6 +1030,14 @@
 
     <div class="announcements-grid">
       <div class="announcement-card">
+        <div class="announcement-tag">Bible Study</div>
+        <div class="announcement-name">Pastor's Bible Study — Tackle Tough Situations</div>
+        <div class="announcement-when">Every Wednesday &middot; 7:00 PM &middot; Online and In-Person &middot; Resumes Wednesday, September 16</div>
+        <div class="announcement-desc">How can I best tackle tough situations in biblical ways? Join Pastor Johnson for Bible Study, available both online and in-person at Messiah UMC.</div>
+        <div class="announcement-contact">Messiah United Methodist Church &middot; 527 Ridge Pike, Lafayette Hill</div>
+      </div>
+
+      <div class="announcement-card">
         <div class="announcement-tag">Outreach</div>
         <div class="announcement-name">Got Books? Messiah UMC Book Drive</div>
         <div class="announcement-when">Ongoing</div>
@@ -1046,14 +1054,21 @@
       </div>
 
       <div class="announcement-card">
-        <div class="announcement-tag">Outreach</div>
-        <div class="announcement-name">Sponsor a Student Backpack</div>
-        <div class="announcement-when">Donation deadline: Sunday, August 9, 2026 &middot; Distribution: Saturday, August 22, 2026 &middot; 1:00 &ndash; 4:00 PM</div>
-        <div class="announcement-desc">Just $15 sponsors one student with a prefilled backpack of essential school supplies. Donate by check or money order payable to Messiah United Methodist Church (note "Backpack Drive" in the memo line), or mail to Messiah United Methodist Church, 527 Ridge Pike, Lafayette Hill, PA 19444.</div>
-        <div class="announcement-contact">Every backpack, every supply, every donation creates opportunity and changes lives.</div>
+        <div class="announcement-tag">Fellowship</div>
+        <div class="announcement-name">Family Game and Movie Night</div>
+        <div class="announcement-when">Friday, November 13 &middot; 6:00 PM Dinner &middot; Games and Movie to Follow</div>
+        <div class="announcement-desc">Bring a friend, family member, or a neighbor. Join us for an evening of laughter and fellowship &mdash; dinner, snacks, popcorn, and beverages provided.</div>
+        <div class="announcement-contact">Messiah United Methodist Church &middot; 527 Ridge Pike, Lafayette Hill</div>
+      </div>
+
+      <div class="announcement-card">
+        <div class="announcement-tag">Fundraiser</div>
+        <div class="announcement-name">Chicken BBQ Dinner</div>
+        <div class="announcement-when">Saturday, October 24 &middot; 4:00 &ndash; 7:00 PM &middot; Messiah UMC, 527 Ridge Pike, Lafayette Hill</div>
+        <div class="announcement-desc">Join us for our annual Chicken BBQ Dinner fundraiser &mdash; a great meal supporting Messiah UMC. $17 per dinner.</div>
+        <div class="announcement-contact">Order ahead using the link below</div>
         <div style="display:flex; gap:0.6rem; margin-top:1rem; flex-wrap:wrap;">
-          <a href="https://docs.google.com/forms/d/e/1FAIpQLScSaZGqn_EUtq_lt3jjIev4ZjpjcNJLrDi1q7AgGLMBhSrdHw/viewform" target="_blank" rel="noopener" class="doc-archive-link" style="display:inline-block;">RSVP</a>
-          <a href="https://docs.google.com/forms/d/e/1FAIpQLSeRmtYKdHLS-OlXDgFIKHUVQ3eGD-wXMu7l4RqlXjUE7--wOA/viewform" target="_blank" rel="noopener" class="doc-archive-link" style="display:inline-block; background:var(--gold); color:var(--dark);">Volunteer Sign Up</a>
+          <a href="chicken-bbq.html" class="doc-archive-link" style="display:inline-block; background:var(--gold); color:var(--dark);">Order Your Platter</a>
         </div>
       </div>
 
@@ -1130,11 +1145,13 @@
 (function() {
   var flyers = [
     { src: 'images/flyer-prayer.jpg', label: "Pastor's Prayer Time" },
+    { src: 'images/flyer-biblestudy.jpg', label: "Pastor's Bible Study" },
     { src: 'images/flyer-bookdrive.jpg', label: 'Messiah UMC Book Drive' },
     { src: 'images/flyer-witw.jpg', label: 'Women in the Word Book Club' },
-    { src: 'images/flyer-backpack.jpg', label: 'Sponsor a Student Backpack' },
     { src: 'images/flyer-backtochurch.jpg', label: 'Back to Church Worship & Block Party' },
-    { src: 'images/flyer-travel-pastor-wheel.jpg', label: 'Travel with the Pastor' }
+    { src: 'images/flyer-travel-pastor-wheel.jpg', label: 'Travel with the Pastor' },
+    { src: 'images/flyer-gamenight.png', label: 'Family Game and Movie Night' },
+    { src: 'images/flyer-chickenbbq.jpg', label: 'Chicken BBQ Dinner' }
   ];
 
   var wheel = document.getElementById('flyer-wheel');
@@ -1231,6 +1248,7 @@
   ];
 
   var circuitWriters = [
+    { date: '2026-09-01', label: 'September & October 2026', sub: 'Volume 36, Issue 5', file: 'documents/circuit-writer-2026-09.pdf' },
     { date: '2026-07-01', label: 'July & August 2026', sub: 'Volume 36, Issue 4', file: 'documents/circuit-writer-2026-07.pdf' }
   ];
 
