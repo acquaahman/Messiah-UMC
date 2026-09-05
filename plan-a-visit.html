@@ -68,10 +68,11 @@
   .pv-row-2 { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
   @media (max-width:600px) { .pv-row-2 { grid-template-columns:1fr; } }
 
-  .pv-child-row { display:grid; grid-template-columns: 1.3fr 1fr 0.8fr 1fr auto; gap:0.6rem; margin-bottom:0.8rem; align-items:end; }
+  .pv-child-row { display:grid; grid-template-columns: 1.3fr 1fr 0.8fr 1fr auto; gap:0.6rem; margin-bottom:0.8rem; align-items:center; }
   @media (max-width:700px) { .pv-child-row { grid-template-columns: 1fr 1fr; } }
-  .pv-child-row input { padding:0.6rem 0.7rem; font-size:0.85rem; }
-  .pv-remove-child { background:none; border:1px solid var(--crimson); color:var(--crimson); border-radius:4px; padding:0.5rem 0.7rem; cursor:pointer; font-size:0.8rem; }
+  .pv-child-row input { padding:0.6rem 0.7rem; font-size:0.85rem; height:40px; box-sizing:border-box; }
+  .pv-remove-child { background:none; border:1px solid var(--crimson); color:var(--crimson); border-radius:4px; padding:0.5rem 0.7rem; cursor:pointer; font-size:0.8rem; height:40px; box-sizing:border-box; }
+  @media (max-width:700px) { .pv-remove-child { grid-column: 1 / -1; width:100%; } }
   .pv-add-child { background:none; border:1px dashed var(--gold); color:var(--crimson-dk); border-radius:4px; padding:0.6rem 1rem; cursor:pointer; font-size:0.85rem; font-weight:700; margin-top:0.3rem; }
 
   .pv-checkbox-row { display:flex; align-items:flex-start; gap:0.6rem; margin-bottom:0.7rem; font-size:0.92rem; }
@@ -219,7 +220,7 @@
 </footer>
 
 <script>
-  const PV_FORMSPREE_ENDPOINT = "https://formspree.io/f/xnpqzwar";
+  const PV_FORMSPREE_ENDPOINT = "https://formspree.io/f/REPLACE_ME_VISIT";
   let childCount = 0;
 
   function addChildRow() {
