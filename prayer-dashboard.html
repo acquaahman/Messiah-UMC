@@ -236,7 +236,7 @@
 <div class="export-overlay" id="exportOverlay">
   <div class="export-modal">
     <h2>Copy List for Bulletin</h2>
-    <p>This includes only <strong>active</strong> requests, formatted the same way they already appear in the bulletin. Click "Copy to Clipboard," then paste directly into the bulletin document.</p>
+    <p>This includes only <strong>active, non-confidential</strong> requests, formatted the same way they already appear in the bulletin. Confidential requests are always left out of this list. Click "Copy to Clipboard," then paste directly into the bulletin document.</p>
     <textarea class="export-textarea" id="exportText" readonly onclick="this.select()"></textarea>
     <div class="export-actions">
       <button class="btn btn-delete" onclick="closeExportModal()">Close</button>
@@ -248,53 +248,48 @@
 
 <script>
 // ============================================================
-//  CONFIG
+//  CONFIG — same Supabase project as the rental dashboard
 // ============================================================
 const SUPABASE_URL      = 'https://qxlssbpjspkhgtcixqgx.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_GjV1BYXA6TS0K_BQqv8sMA_5MrRV3Nk';
 
 const STALE_DAYS = 30; // requests older than this get flagged
 
+const TEAM_EMAILS = {
+  'Rev. Johnson':   'revrlj1@msn.com',
+  'Minister Kim':   'charleston.kimberly@yahoo.com',
+  'Minister Brenda': 'brendaroberson5@gmail.com'
+};
+
 let allRequests = [];
 
 async function checkPassword() {
   const input = document.getElementById('pwInput').value.trim();
   const error = document.getElementById('pwError');
-
   error.style.display = 'none';
 
   try {
     const response = await fetch('/.netlify/functions/admin-login', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        password: input
-      })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: input })
     });
-
     const result = await response.json();
 
     if (response.ok && result.success) {
       document.getElementById('passwordScreen').style.display = 'none';
-
-      sessionStorage.setItem(
-        'messiah_prayer_dashboard_access',
-        'granted'
-      );
-
+      sessionStorage.setItem('messiah_prayer_dashboard_access', 'granted');
       loadRequests();
     } else {
       error.style.display = 'block';
       document.getElementById('pwInput').value = '';
     }
-
   } catch (err) {
     console.error('Login error:', err);
     error.style.display = 'block';
   }
 }
+
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('pwInput').addEventListener('keydown', (e) => {
     if (e.key === 'Enter') checkPassword();
@@ -370,12 +365,19 @@ function renderCard(r) {
   const isOld = age >= STALE_DAYS;
   const statusLabel = r.status.charAt(0).toUpperCase() + r.status.slice(1);
 
+  const teamOptions = ['', 'Rev. Johnson', 'Minister Kim', 'Minister Brenda']
+    .map(name => `<option value="${name}" ${r.assigned_to === name ? 'selected' : ''}>${name || 'Unassigned'}</option>`)
+    .join('');
+
   let actionHtml = '';
   if (r.status === 'active') {
     actionHtml = `
       <div class="action-row">
         <button class="btn btn-confirm" onclick="markComplete('${r.id}')">✓ Mark Complete</button>
         <button class="btn btn-delete" onclick="deleteRequest('${r.id}')">🗑 Delete</button>
+        <select class="filter-select" style="color:var(--dark); border-color:rgba(139,0,0,0.3); background:var(--white);" onchange="assignRequest('${r.id}', this.value)">
+          ${teamOptions}
+        </select>
       </div>
     `;
   } else {
@@ -395,6 +397,7 @@ function renderCard(r) {
             <span class="status-badge status-${r.status}">${statusLabel}</span>
             ${r.confidential ? '<span class="status-badge badge-confidential">Confidential</span>' : ''}
             ${isOld ? `<span class="status-badge badge-old">⏱ ${age} days old</span>` : ''}
+            ${r.assigned_to ? `<span class="status-badge" style="background:rgba(46,125,50,0.12); color:var(--success);">Assigned: ${escapeHtml(r.assigned_to)}</span>` : ''}
           </div>
         </div>
       </div>
@@ -411,6 +414,39 @@ function renderCard(r) {
 
 async function markComplete(id) {
   await updateRequest(id, { status: 'completed' });
+}
+
+async function assignRequest(id, assigneeName) {
+  const record = allRequests.find(r => r.id === id);
+  if (!record) return;
+
+  await updateRequest(id, { assigned_to: assigneeName || null });
+
+  if (!assigneeName) return; // "Unassigned" selected — no email to send
+
+  const toEmail = TEAM_EMAILS[assigneeName];
+  if (!toEmail || toEmail.startsWith('REPLACE_ME')) {
+    alert(`${assigneeName}'s email isn't set up yet in the dashboard code, so no notification was sent. The assignment itself was still saved.`);
+    return;
+  }
+
+  try {
+    await fetch('/.netlify/functions/notify-prayer-assignment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        to: toEmail,
+        assigneeName: assigneeName,
+        requestName: record.name,
+        contact: record.contact,
+        details: record.details,
+        confidential: record.confidential,
+        submittedAt: new Date(record.submitted_at).toLocaleString('en-US', { timeZone: 'America/New_York' })
+      })
+    });
+  } catch (err) {
+    console.error('Assignment email failed:', err);
+  }
 }
 
 async function deleteRequest(id) {
@@ -464,7 +500,7 @@ function escapeHtml(str) {
 //  COPY LIST FOR BULLETIN
 // ============================================================
 function openExportModal() {
-  const active = allRequests.filter(r => r.status === 'active');
+  const active = allRequests.filter(r => r.status === 'active' && !r.confidential);
   const lines = active.map(r => {
     const details = (r.details || '').trim();
     return details ? `${r.name} ${details}` : r.name;
