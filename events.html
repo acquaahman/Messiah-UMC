@@ -1084,6 +1084,17 @@
       </div>
 
       <div class="announcement-card">
+        <div class="announcement-tag">Ministry</div>
+        <div class="announcement-name">Women at the Well</div>
+        <div class="announcement-when">Saturday, October 10 &middot; 10:00 AM &middot; Messiah UMC, 527 Ridge Pike, Lafayette Hill</div>
+        <div class="announcement-desc">Come. Connect. Be renewed. Jesus meets us here. Led by Min. Jennifer Crosby and Min. Brenda Roberson. Please register by October 2, 2026.</div>
+        <div class="announcement-contact">Questions? <a href="mailto:brendaroberson08@gmail.com">brendaroberson08@gmail.com</a></div>
+        <div style="display:flex; gap:0.6rem; margin-top:1rem; flex-wrap:wrap;">
+          <a href="https://docs.google.com/forms/d/e/1FAIpQLSe6sxsnxTpQa3IxUQuhfdT2Dnn6zpdcJYqwjyr570XudhnimQ/viewform" target="_blank" rel="noopener" class="doc-archive-link" style="display:inline-block; background:var(--gold); color:var(--dark);">Register Here</a>
+        </div>
+      </div>
+
+      <div class="announcement-card">
         <div class="announcement-tag">Community</div>
         <div class="announcement-name">Back to Church Worship &amp; Block Party</div>
         <div class="announcement-when">Sunday, September 20 &middot; 10:30 AM &ndash; 3:00 PM &middot; Messiah UMC, 527 Ridge Pike, Lafayette Hill</div>
@@ -1162,7 +1173,8 @@
     { src: 'images/flyer-backtochurch.jpg', label: 'Back to Church Worship & Block Party' },
     { src: 'images/flyer-travel-pastor-wheel.jpg', label: 'Travel with the Pastor' },
     { src: 'images/flyer-gamenight.png', label: 'Family Game and Movie Night' },
-    { src: 'images/flyer-chickenbbq.jpg', label: 'Chicken BBQ Dinner' }
+    { src: 'images/flyer-chickenbbq.jpg', label: 'Chicken BBQ Dinner', link: 'chicken-bbq.html' },
+    { src: 'images/flyer-womenatthewell.png', label: 'Women at the Well', link: 'https://docs.google.com/forms/d/e/1FAIpQLSe6sxsnxTpQa3IxUQuhfdT2Dnn6zpdcJYqwjyr570XudhnimQ/viewform', linkLabel: 'Tap to Register →' }
   ];
 
   var wheel = document.getElementById('flyer-wheel');
@@ -1184,6 +1196,25 @@
     img.alt = f.label;
     img.loading = 'lazy';
     card.appendChild(img);
+
+    if (f.link) {
+      card.style.cursor = 'pointer';
+      // "Tap to ___" cue so it's clear this specific flyer is clickable
+      // (the wheel itself has no click behavior otherwise, by design)
+      var cue = document.createElement('div');
+      cue.textContent = f.linkLabel || 'Tap to Order →';
+      cue.style.cssText = 'position:absolute; bottom:10px; left:0; right:0; text-align:center; background:rgba(139,0,0,0.85); color:#fff; font-size:0.78rem; font-weight:700; padding:0.4rem 0; letter-spacing:0.02em;';
+      card.appendChild(cue);
+
+      card.addEventListener('click', function() {
+        // Only navigate on a real click, not the release of a drag —
+        // dragMoved is tracked by the shared onDown/onMove/onUp handlers below.
+        if (!dragMoved) {
+          window.location.href = f.link;
+        }
+      });
+    }
+
     wheel.appendChild(card);
 
     var dot = document.createElement('div');
@@ -1195,6 +1226,7 @@
   var startX = 0;
   var dragging = false;
   var startRotation = 0;
+  var dragMoved = false;
 
   function updateActive() {
     var normalized = ((-currentRotation % 360) + 360) % 360;
@@ -1219,12 +1251,15 @@
 
   function onDown(x) {
     dragging = true;
+    dragMoved = false;
     startX = x;
     startRotation = currentRotation;
     stage.classList.add('dragging');
   }
   function onMove(x) {
     if (!dragging) return;
+    // A few pixels of jitter shouldn't count as a drag and block a real tap
+    if (Math.abs(x - startX) > 5) dragMoved = true;
     currentRotation = startRotation + (x - startX) * 0.5;
     applyRotation();
   }
