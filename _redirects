@@ -1,1 +1,2 @@
-/tap/*  /.netlify/functions/nfc-redirect?tag=:splat  200
+/connect   /connect.html   200
+/tap/*     /.netlify/functions/nfc-redirect?tag=:splat   200
