@@ -1395,7 +1395,7 @@
     <div class="footer-links">
       <a href="https://www.facebook.com/MessiahMethodistChurch" target="_blank">Facebook</a>
       <a href="https://www.youtube.com/channel/UCwRLaTNW4-AAh3RkIq1IrhA" target="_blank">YouTube</a>
-      <a href="http://instagram.com/messiah_umc" target="_blank">Instagram</a>
+      <a href="https://instagram.com/messiah_umc" target="_blank">Instagram</a>
       <a href="https://www.messiahmethodistchurch.com/texting-policy" target="_blank">Texting Policy</a>
     </div>
   </div>
@@ -1598,6 +1598,15 @@ function openPrayerModal() {
 function closePrayerModal() {
   document.getElementById('prayerModalOverlay').classList.remove('open');
 }
+
+// Open the existing prayer-request modal when arriving from /connect
+// with the URL parameter ?prayer=1.
+document.addEventListener('DOMContentLoaded', function() {
+  var params = new URLSearchParams(window.location.search);
+  if (params.get('prayer') === '1') {
+    openPrayerModal();
+  }
+});
 document.getElementById('prayerModalOverlay').addEventListener('click', function(e) {
   if (e.target === this) closePrayerModal();
 });
