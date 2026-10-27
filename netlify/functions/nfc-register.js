@@ -21,7 +21,7 @@ exports.handler = async (event) => {
   try { body=JSON.parse(event.body||'{}'); } catch { return json(400,{success:false,message:'Invalid JSON'}); }
   const code=String(body.tag_code||'').trim().toUpperCase();
   if (!/^MUMC-\d{3}$/.test(code)) return json(400,{success:false,message:'Invalid tag code'});
-  const destination_url='https://messiahmethodistchurch.com/';
+  const destination_url='https://www.messiahmethodistchurch.com/connect';
   try {
     const get=await sb(`nfc_tags?tag_code=eq.${encodeURIComponent(code)}&select=id,tag_code,status&limit=1`);
     if (!get.ok) throw Error(`Lookup failed: ${get.status}`);
@@ -35,7 +35,7 @@ exports.handler = async (event) => {
       }
       return json(200,{success:true,action:rows[0].status==='inactive'?'reactivated':'existing',tag_code:code});
     }
-    const payload={tag_code:code,location:`Production Tag ${code.slice(5)}`,destination_name:'Church Website',destination_url,status:'active',notes:'Registered by Akwaman Tag Provisioner'};
+    const payload={tag_code:code,location:`Production Tag ${code.slice(5)}`,destination_name:'All-Purpose Connect Page',destination_url,status:'active',notes:'Registered by Akwaman Tag Provisioner'};
     const created=await sb('nfc_tags',{method:'POST',headers:{'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify(payload)});
     if (!created.ok) {
       // Concurrent insert: treat as retryable failure, never overwrite.
