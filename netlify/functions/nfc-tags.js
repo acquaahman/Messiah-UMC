@@ -99,12 +99,45 @@ async function updateTag(event) {
   return json(200, { success: true, tag: rows[0] });
 }
 
+
+// A single server-side update changes only the destination fields for explicitly selected records.
+async function bulkUpdate(event) {
+  let body;
+  try { body = JSON.parse(event.body || '{}'); } catch { return json(400,{success:false,message:'Invalid JSON.'}); }
+  const ids = body.ids;
+  if (!Array.isArray(ids) || !ids.length || ids.length > 100 || ids.some(id => typeof id !== 'string' || !/^[0-9a-f-]{36}$/i.test(id)) || new Set(ids).size !== ids.length)
+    return json(400,{success:false,message:'Select between 1 and 100 unique valid disc IDs.'});
+  const destination_name = String(body.destination_name || '').trim();
+  const destination_url = String(body.destination_url || '').trim();
+  if (!destination_name || destination_name.length > 100) return json(400,{success:false,message:'Destination name is required.'});
+  try { const url = new URL(destination_url); if (!['http:','https:'].includes(url.protocol)) throw Error(); }
+  catch { return json(400,{success:false,message:'Invalid destination URL.'}); }
+  const idList = ids.join(',');
+  const current = await sb(`nfc_tags?id=in.(${idList})&select=id,destination_url`);
+  if (!current.ok) throw Error('Could not verify selected discs.');
+  const rows = await current.json();
+  if (rows.length !== ids.length) return json(409,{success:false,message:'Some selected discs no longer exist. Refresh and try again.'});
+  const originalHomepages = new Set(['https://messiahmethodistchurch.com/','https://www.messiahmethodistchurch.com/','https://messiahmethodistchurch.com','https://www.messiahmethodistchurch.com']);
+  const eligible = body.only_default === true ? rows.filter(t=>originalHomepages.has(t.destination_url)) : rows;
+  if (!eligible.length) return json(200,{success:true,updated:0,skipped:ids.length});
+  const eligibleIds = eligible.map(t=>t.id).join(',');
+  const patch = await sb(`nfc_tags?id=in.(${eligibleIds})`,{
+    method:'PATCH',headers:{'Content-Type':'application/json',Prefer:'return=representation'},
+    body:JSON.stringify({destination_name,destination_url})
+  });
+  if (!patch.ok) { console.error('Bulk update failed:',patch.status,await patch.text()); return json(500,{success:false,message:'Unable to bulk update selected discs.'}); }
+  const changed = await patch.json();
+  if (changed.length !== eligible.length) return json(409,{success:false,message:'Update count mismatch. Refresh and inspect the discs before retrying.'});
+  return json(200,{success:true,updated:changed.length,skipped:ids.length-changed.length});
+}
+
 exports.handler = async function(event) {
   if (!isValidSession(event)) return json(401, { success: false, message: 'Unauthorized' });
   try {
     if (event.httpMethod === 'GET') return json(200, { success: true, tags: await getTags() });
     if (event.httpMethod === 'POST') return await createTag(event);
     if (event.httpMethod === 'PATCH') return await updateTag(event);
+    if (event.httpMethod === 'PUT') return await bulkUpdate(event);
     return json(405, { success: false, message: 'Method not allowed' });
   } catch (error) {
     console.error('NFC tags function error:', error);
